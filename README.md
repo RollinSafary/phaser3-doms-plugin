@@ -1,4 +1,4 @@
-# Phaser3 Nine Patch
+# Phaser3 Doms Plugin
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/rollinsafary/phaser3-doms-plugin/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/%40rollinsafary%2Fphaser3-doms-plugin.svg)](https://badge.fury.io/js/%40rollinsafary%2Fphaser3-doms-plugin)
