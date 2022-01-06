@@ -2,13 +2,19 @@
  * DomPlugin
  */
 
-import { DomButton, IDomButtonConfig } from "./plugin/components/DomButton";
-import { DomContainer, IDomContainerConfig } from "./plugin/components/DomContainer";
-import { DomExtendedText, IDomExtendedTextConfig } from "./plugin/components/DomExtendedText";
-import { DomGameObject, IDomBaseGameObjectConfig, IDomGameObjectConfig } from "./plugin/components/DomGameObject";
-import { DomImage, IDomImageConfig } from "./plugin/components/DomImage";
-import { DomSelect, IDomSelectConfig } from "./plugin/components/DomSelect";
-import { DomSprite, IDomSpriteConfig } from "./plugin/components/DomSprite";
+import { DomContainer, IDomContainerConfig } from "./plugin/components/gameObjects/DomContainer";
+import { DomExtendedText, IDomExtendedTextConfig } from "./plugin/components/gameObjects/DomExtendedText";
+import {
+    DomGameObject,
+    DomGameObjectCreator,
+    DomGameObjectEventName,
+    DomGameObjectFactory,
+    IDomBaseGameObjectConfig,
+    IDomGameObjectConfig
+} from "./plugin/components/gameObjects/DomGameObject";
+import { DomImage, IDomImageConfig } from "./plugin/components/gameObjects/DomImage";
+import { DomSelect, IDomSelectConfig } from "./plugin/components/gameObjects/DomSelect";
+import { DomSprite, IDomSpriteConfig } from "./plugin/components/gameObjects/DomSprite";
 import {
     CssTextAlignLastType,
     CssTextAlignType,
@@ -32,17 +38,16 @@ import {
     IDomTextConfig,
     IDomTextFontStyle,
     IDomTextStyle
-} from "./plugin/components/DomText";
-import { DomsPlugin, IDomsCreator, IDomsFactory } from "./plugin/DomsPlugin";
+} from "./plugin/components/gameObjects/DomText";
+import DomScene from "./plugin/components/scene/DomScene";
+import { DomsPlugin } from "./plugin/DomsPlugin";
 import { DomEventName, MouseEventName, PointerEventName } from "./plugin/enums/Events";
 
 namespace PhaserDoms {
-    export namespace Scene {
-        export interface Factory extends IDomsFactory {}
-        export interface Creator extends IDomsCreator {}
-    }
+    export class Scene extends DomScene {}
 
     export namespace GameObjects {
+        export const Events = DomGameObjectEventName;
         export class GameObject extends DomGameObject {}
         export class Container extends DomContainer {}
         export class Sprite extends DomSprite {}
@@ -50,7 +55,8 @@ namespace PhaserDoms {
         export class Text extends DomText {}
         export class ExtendedText extends DomExtendedText {}
         export class Select extends DomSelect {}
-        export class Button extends DomButton {}
+        export type GameObjectFactory = Phaser.GameObjects.GameObjectFactory & DomGameObjectFactory;
+        export type GameObjectCreator = Phaser.GameObjects.GameObjectCreator & DomGameObjectCreator;
     }
 
     export namespace Plugin {
@@ -113,9 +119,6 @@ namespace PhaserDoms {
             }
             export namespace Select {
                 export interface Config extends IDomSelectConfig {}
-            }
-            export namespace Button {
-                export interface Config extends IDomButtonConfig {}
             }
         }
     }

@@ -1,28 +1,30 @@
-import { DomButtonCreator, DomButtonFactory } from "./components/DomButton";
-import { DomContainer, DomContainerCreator, DomContainerFactory, IDomContainerConfig } from "./components/DomContainer";
-import { DomExtendedText, DomExtTextCreator, DomExtTextFactory, IDomExtendedTextConfig } from "./components/DomExtendedText";
-import { DomGameObject, DomGameObjectCreator, DomGameObjectFactory, IDomGameObjectConfig } from "./components/DomGameObject";
-import { DomImage, DomImageCreator, DomImageFactory, IDomImageConfig } from "./components/DomImage";
-import { DomSelect, DomSelectCreator, DomSelectFactory, IDomSelectConfig } from "./components/DomSelect";
-import { DomSprite, DomSpriteCreator, DomSpriteFactory, IDomSpriteConfig } from "./components/DomSprite";
-import { DomText, DomTextCreator, DomTextFactory, IDomTextConfig, IDomTextStyle } from "./components/DomText";
+import { I18nGame } from "@rollinsafary/phaser3-i18n-plugin";
+import { DomContainer, IDomContainerConfig } from "./components/gameObjects/DomContainer";
+import { DomExtendedText, IDomExtendedTextConfig } from "./components/gameObjects/DomExtendedText";
+import { DomGameObject, IDomGameObjectConfig } from "./components/gameObjects/DomGameObject";
+import { DomImage, IDomImageConfig } from "./components/gameObjects/DomImage";
+import { DomSelect, IDomSelectConfig } from "./components/gameObjects/DomSelect";
+import { DomSprite, IDomSpriteConfig } from "./components/gameObjects/DomSprite";
+import { DomText, IDomTextConfig, IDomTextStyle } from "./components/gameObjects/DomText";
+import DomScene from "./components/scene/DomScene";
 
 export class DomsPlugin extends Phaser.Plugins.BasePlugin {
-    public scene: Phaser.Scene;
+    public scene: DomScene;
     constructor(pluginManager: Phaser.Plugins.PluginManager) {
         super(pluginManager);
         //  Register our new Game Object types
         pluginManager.registerGameObject("domGameObject", this.domGameObjectFactory, this.domGameObjectCreator);
         pluginManager.registerGameObject("domContainer", this.domContainerFactory, this.domContainerCreator);
         pluginManager.registerGameObject("domText", this.domTextFactory, this.domTextCreator);
-        pluginManager.registerGameObject("domExtText", this.domExtTextFactory, this.domExtTextCreator);
+        !!(pluginManager.game as I18nGame).i18n &&
+            pluginManager.registerGameObject("domExtText", this.domExtTextFactory, this.domExtTextCreator);
         pluginManager.registerGameObject("domSprite", this.domSpriteFactory, this.domSpriteCreator);
         pluginManager.registerGameObject("domImage", this.domImageFactory, this.domImageCreator);
         pluginManager.registerGameObject("domSelect", this.domSelectFactory, this.domSelectCreator);
+        pluginManager.registerGameObject("existingDom", this.existingDomFactory);
     }
 
     // DomGameObject
-
     private domGameObjectFactory(x?: number, y?: number, tagName?: string): DomGameObject {
         return this.scene.add.existing(new DomGameObject(this.scene, x, y, tagName));
     }
@@ -170,31 +172,32 @@ export class DomsPlugin extends Phaser.Plugins.BasePlugin {
         Phaser.GameObjects.BuildGameObject(this.scene, object, config);
         return object;
     }
+
+    // ExistingDom
+    private existingDomFactory<G extends DomGameObject>(child: G): G {
+        this.scene.add.existing(child);
+        this.scene.layout?.add(child);
+        return child;
+    }
 }
 
 export interface IDomsFactory {
-    domGameObject: DomGameObjectFactory;
-    domContainer: DomContainerFactory;
-    domSprite: DomSpriteFactory;
-    domImage: DomImageFactory;
-    domText: DomTextFactory;
-    domExtText?: DomExtTextFactory;
-    domSelect: DomSelectFactory;
-    domButton: DomButtonFactory;
+    domGameObject(x?: number, y?: number, tagName?: string): DomGameObject;
+    domContainer(x?: number, y?: number, width?: number, height?: number): DomContainer;
+    domSprite(x: number, y: number, key: string): DomSprite;
+    domImage(x: number, y: number, key: string): DomImage;
+    domText(x?: number, y?: number, text?: string, style?: IDomTextStyle): DomText;
+    domExtText?(x?: number, y?: number, text?: string, style?: IDomTextStyle): DomExtendedText;
+    domSelect(config: IDomSelectConfig): DomSelect;
+    existingDom<G extends DomGameObject>(child: G): G;
 }
 
 export interface IDomsCreator {
-    domGameObject: DomGameObjectCreator;
-    domContainer: DomContainerCreator;
-    domSprite: DomSpriteCreator;
-    domImage: DomImageCreator;
-    domText: DomTextCreator;
-    domExtText?: DomExtTextCreator;
-    domSelect: DomSelectCreator;
-    domButton: DomButtonCreator;
-}
-
-export interface IDomsScene {
-    add: IDomsFactory;
-    make: IDomsCreator;
+    domGameObject(config: IDomGameObjectConfig, addToScene?: boolean): DomGameObject;
+    domContainer(config?: IDomContainerConfig, addToScene?: boolean): DomContainer;
+    domSprite(config: IDomSpriteConfig, addToScene?: boolean): DomSprite;
+    domImage(config: IDomImageConfig, addToScene?: boolean): DomImage;
+    domText(config: IDomTextConfig, addToScene?: boolean): DomText;
+    domExtText?(config: IDomExtendedTextConfig, addToScene?: boolean): DomExtendedText;
+    domSelect(config: IDomSelectConfig, addToScene?: boolean): DomSelect;
 }
